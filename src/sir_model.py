@@ -134,7 +134,7 @@ def sir_step(S, I, R, N, neighbors, beta, gamma, tau):
     return S2, I2, R2
 
 
-def run_sir(S, I, R, N, neighbors, beta, gamma, tau, T=120, z_beta = None, z_tau = None, z_gamma = None):
+def run_sir(S, I, R, N, neighbors, beta, gamma, tau, T=120, z_beta = None, z_gamma = None, z_tau = None):
     """
     Runs the SIR model for T time steps and returns the total number of infected individuals at each step.
     - S: array of susceptible individuals in each county
