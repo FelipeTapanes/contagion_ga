@@ -116,7 +116,7 @@ def sir_step(S, I, R, N, neighbors, beta, gamma, tau):
             pressure += w_ij * (I[j] / N[j])
 
         # The number of new imported infections in county i is proportional to the pressure from neighboring counties and the number of susceptible individuals in county i
-        new_import[i] = tau * S[i] * pressure
+        new_import[i] = tau[i] * S[i] * pressure
 
     # Recoveries
     new_rec = gamma * I
@@ -134,9 +134,9 @@ def sir_step(S, I, R, N, neighbors, beta, gamma, tau):
     return S2, I2, R2
 
 
-def run_sir(S, I, R, N, neighbors, beta, gamma, tau, T=120):
+def run_sir(S, I, R, N, neighbors, beta, gamma, tau, T=120, z_beta = None, z_tau = None, z_gamma = None):
     """
-    Runs the SIR model for T time steps and returns the total number of infected individuals at each time step.
+    Runs the SIR model for T time steps and returns the total number of infected individuals at each step.
     - S: array of susceptible individuals in each county
     - I: array of infected individuals in each county
     - R: array of recovered individuals in each county
@@ -145,18 +145,36 @@ def run_sir(S, I, R, N, neighbors, beta, gamma, tau, T=120):
     - beta: infection rate for local infections
     - gamma: recovery rate
     - tau: scaling factor for imported infections from neighboring counties
-    - T: number of time steps to run the model
-    Returns:
-    - total_I: an array of the total number of infected individuals across all counties at each time step
+    - T: number of time steps to run the simulation
+    - z_beta: optional array of intervention parameters that reduce the infection rate
+    - z_gamma: optional array of intervention parameters that increase the recovery rate 
+    - z_tau: optional array of intervention parameters that reduce the imported infection rate
+    Returns:- total_I: an array of the total number of infected individuals at each time step
     """
 
+    # If the intervention parameters are not provided, initialize them as zero arrays (no intervention)
+    n = len(S)
+
+    if z_beta is None:
+        z_beta = np.zeros(n)
+
+    if z_gamma is None:
+        z_gamma = np.zeros(n)
+
+    if z_tau is None:
+        z_tau = np.zeros(n)
+
     total_I = []
-    max_I = 0
+
+    # set the effective parameters for the SIR model based on the intervention parameters.
+    beta_intervention  = beta  * (1 - z_beta)
+    gamma_intervention = gamma * (1 + z_gamma)
+    tau_intervention   = tau   * (1 - z_tau)
 
     # Run the SIR model for T time steps and record the total number of infected individuals at each step
     for _ in range(T):
         total_I.append(I.sum())
-        S, I, R = sir_step(S, I, R, N, neighbors, beta, gamma, tau)
+        S, I, R = sir_step(S, I, R, N, neighbors, beta_intervention, gamma_intervention, tau_intervention)
 
     # Return the total number of infected individuals at each time step as a numpy array 
     # because it is more convenient for plotting and analysis
