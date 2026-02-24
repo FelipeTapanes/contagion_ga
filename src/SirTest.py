@@ -1,9 +1,10 @@
 from sir_model import build_adjacency, init_sir, run_sir
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import numpy as np
 
 
-def main():
+def test():
     # build network from your edges file
     nodes, neighbors = build_adjacency(
         edges_csv_path="data/edges_k4.csv",  
@@ -21,9 +22,11 @@ def main():
 
     # parameters (start values; you will tune later)
     beta = 0.43
-    gamma = 0.10
+    gamma = 0.1
     tau = 0.1
     T = 120
+
+    n = len(S)
 
     # run sim
     total_I = run_sir(S, I, R, N, neighbors, beta, gamma, tau, T=T)
@@ -52,4 +55,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    test()
