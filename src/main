@@ -14,7 +14,7 @@ def main():
     costs = [ind.fitness.values[1] for ind in front]
     front = sorted(front, key=lambda ind: ind.fitness.values[0])  # Sort by peak infected
 
-    print_strong_interventions(front[0], nodes, threshold=0.7)
+    print_strong_interventions(front[-1], nodes, threshold=0.7)
 
     # Plot Pareto front
     plt.scatter(costs, peaks)

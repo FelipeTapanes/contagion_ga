@@ -20,7 +20,7 @@ def test():
         seed_infected=50
     )
 
-    # parameters (start values; you will tune later)
+    # parameters
     beta = 0.43
     gamma = 0.1
     tau = 0.1

@@ -130,7 +130,7 @@ def run_nsga2(
     pop_size=150,
     # - number of generations: you can adjust this based on how long you want the optimization to run 
     # - and how good you want the solutions to be. More generations typically lead to better solutions but take more time.
-    ngen=150,
+    ngen=105,
     # - crossover probability: this controls how often crossover (recombination) happens between individuals.
     # - A common choice is around 0.9, which means that 90% of the time, offspring are produced by crossing over two parents,
     # -  and 10% of the time, offspring are produced by copying a parent (without crossover).
