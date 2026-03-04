@@ -89,8 +89,8 @@ def clip01(individual):
     for i in range(len(individual)):
         if individual[i] < 0.0:
             individual[i] = 0.0
-        elif individual[i] > 1.0:
-            individual[i] = 1.0
+        elif individual[i] > 0.8:
+            individual[i] = 0.8
     return individual
 
 
@@ -102,7 +102,7 @@ def mut_poly_bounded_and_clip(individual, eta, indpb):
     - indpb: independent probability for each gene to be mutated
     Returns: a tuple containing the mutated individual
     '''
-    tools.mutPolynomialBounded(individual, eta=eta, low=0.0, up=1.0, indpb=indpb)
+    tools.mutPolynomialBounded(individual, eta=eta, low=0.0, up=0.8, indpb=indpb)
     clip01(individual)
     return (individual,)
 
@@ -146,7 +146,9 @@ def run_nsga2(
     # - mutation strength and probability
     mut_eta=20.0,
     # - per-gene mutation probability
-    mut_indpb=0.05
+    mut_indpb=0.05,
+    # - optional callback function to report progress after each generation (e.g., for updating a UI)
+    progress_callback=None
 ):
     '''
     Runs the NSGA-II algorithm to optimize intervention parameters for the SIR model.
@@ -172,7 +174,7 @@ def run_nsga2(
     toolbox = base.Toolbox()
 
     # Attribute generator: random float in [0, 1]
-    toolbox.register("attr_float", random.random)
+    toolbox.register("attr_float", random.uniform, 0.0, 0.8)
     # Structure initializers: define 'individual' to be a list of floats and 'population' to be a list of individuals
     toolbox.register("individual", tools.initRepeat, creator.SirIndividual, toolbox.attr_float, n=genome_len)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
@@ -189,7 +191,7 @@ def run_nsga2(
     )
 
     # NSGA-II operators
-    toolbox.register("mate", tools.cxSimulatedBinaryBounded, low=0.0, up=1.0, eta=cx_eta)
+    toolbox.register("mate", tools.cxSimulatedBinaryBounded, low=0.0, up=0.8, eta=cx_eta)
     toolbox.register("mutate", mut_poly_bounded_and_clip, eta=mut_eta, indpb=mut_indpb)
     toolbox.register("select", tools.selNSGA2)
 
@@ -217,10 +219,12 @@ def run_nsga2(
     # Select the next generation population from the combined parent and offspring population
         pop = toolbox.select(pop + offspring, pop_size)
 
-        # quick progress print
-        peaks = [ind.fitness.values[0] for ind in pop]
-        costs = [ind.fitness.values[1] for ind in pop]
-        print(f"Gen {gen:03d} | best peak={min(peaks):.0f} | best cost={min(costs):.2f}")
+
+    # Optionally report progress after each generation using the provided callback function
+        if progress_callback:
+            best_peak = min(ind.fitness.values[0] for ind in pop)
+            best_cost = min(ind.fitness.values[1] for ind in pop)
+            progress_callback(gen, ngen, best_peak, best_cost)
 
     # First Pareto front
     front = tools.sortNondominated(pop, k=len(pop), first_front_only=True)[0]

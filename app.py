@@ -3,6 +3,7 @@ from matplotlib import ticker
 import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
+import time
 from src.sir_model import build_adjacency, init_sir, run_sir
 from src.nsga2_sir import decode, run_nsga2
 
@@ -100,12 +101,25 @@ def plot_SIR():
     ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x/1_000_000:.1f}M"))
     st.pyplot(fig)
 
+    return total_I.max()
+
 
 
 status = st.empty()
+progress_bar = st.progress(0)
+status_text = st.empty()
 
 if run_btn:
+
     status.info("Running optimisation… (this may take a bit depending on generations/population)")
+
+    def progress_callback(gen, ngen, best_peak=None, best_cost=None):
+        progress_bar.progress(gen / ngen)
+        if best_peak is not None and best_cost is not None:
+            status_text.info(f"Gen {gen}/{ngen} | best peak={best_peak:,.0f} | best cost={best_cost:.2f}")
+        else:
+            status_text.info(f"Generation {gen}/{ngen}")
+        time.sleep(0.01)  # <-- tiny yield so UI actually refreshes
 
     counties, pareto_front = run_nsga2(
         T=days,
@@ -116,9 +130,13 @@ if run_btn:
         gamma=gamma,
         tau=tau,
         seed_county=str(seed_county),
-        seed_infected=int(seed_infected)
+        seed_infected=int(seed_infected),
+        progress_callback=progress_callback
     )
 
+    progress_bar.progress(1.0)
+    status_text.empty()
+    status.success(f"Pareto front complete: {len(pareto_front)} solutions found")
     st.session_state.counties = counties
     st.session_state.pareto_front = pareto_front
 
@@ -133,7 +151,9 @@ if st.session_state.pareto_front is not None:
 
     with col1:
         st.subheader("SIR contagion (no interventions)")
-        plot_SIR()
+        peak0 = plot_SIR()
+                
+        st.metric("Peak infected (baseline)", f"{peak0:,.0f}")
 
         st.subheader("Pareto front")
         costs, infected = plot_pareto(pareto_front)
