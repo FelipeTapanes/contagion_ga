@@ -1,7 +1,7 @@
 import random
 import numpy as np
 from deap import base, creator, tools, algorithms
-from sir_model import build_adjacency, init_sir, run_sir
+from .sir_model import build_adjacency, init_sir, run_sir
 
 
 # --------- HELPER FUNCTIONS ---------
