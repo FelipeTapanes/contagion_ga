@@ -24,7 +24,7 @@ st.set_page_config(page_title="Ireland Contagion Optimiser", layout="wide")
 st.title("Ireland Contagion Optimiser (NSGA-II)")
 st.write("Run the optimiser and inspect the Pareto front + interventions.")
 
-with st.sidebar:
+with st.sidebar.form("params_form"):
     
     st.header("SIR model parameters")
     beta = st.slider("beta (local spread)", 0.01, 1.0, 0.43, step=0.01)
@@ -46,7 +46,7 @@ with st.sidebar:
     ngen = st.slider("Generations", 5, 300, 80, step=5)
     seed = st.number_input("Random seed", value=42, step=1)
 
-    run_btn = st.button("Run NSGA-II", type="primary")
+    run_btn = st.form_submit_button("Run NSGA-II")
 
 
 
@@ -105,11 +105,12 @@ def plot_SIR():
 
 
 
-status = st.empty()
-progress_bar = st.progress(0)
-status_text = st.empty()
 
 if run_btn:
+
+    status = st.empty()
+    progress_bar = st.progress(0)
+    status_text = st.empty()
 
     status.info("Running optimisation… (this may take a bit depending on generations/population)")
 
@@ -152,7 +153,7 @@ if st.session_state.pareto_front is not None:
     with col1:
         st.subheader("SIR contagion (no interventions)")
         peak0 = plot_SIR()
-                
+
         st.metric("Peak infected (baseline)", f"{peak0:,.0f}")
 
         st.subheader("Pareto front")
@@ -167,13 +168,13 @@ if st.session_state.pareto_front is not None:
         idx = st.slider("Solution index", 1, len(pareto_front), 1) - 1
         sol = pareto_front[idx]
 
-        n = len(counties)
+        n = len(nodes)
         z_beta, z_gamma, z_tau = decode(sol, n)
 
         df = pd.DataFrame(
             [z_beta, z_gamma, z_tau],
             index=["beta", "gamma", "tau"],
-            columns=counties
+            columns=nodes
         )
 
         st.dataframe(df)

@@ -118,12 +118,20 @@ def sir_step(S, I, R, N, neighbors, beta, gamma, tau):
         # The number of new imported infections in county i is proportional to the pressure from neighboring counties and the number of susceptible individuals in county i
         new_import[i] = tau[i] * S[i] * pressure
 
-    # Recoveries
-    new_rec = gamma * I
+    # Recoveries (cannot exceed current infected)
+    new_rec = np.minimum(gamma * I, I)
+
+
+    # Total new infections this step
+    new_inf = new_local + new_import
+
+    # Cannot infect more people than susceptibles in each county
+    new_inf = np.minimum(new_inf, S)
+
 
     # Update
     S2 = S - new_local - new_import
-    I2 = I + new_local + new_import - new_rec
+    I2 = I + new_inf - new_rec
     R2 = R + new_rec
 
     # Safety: avoid negative values from floating point due to discrete modeling
