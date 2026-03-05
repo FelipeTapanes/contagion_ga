@@ -179,12 +179,14 @@ if st.session_state.pareto_front is not None:
 
         st.dataframe(df)
 
-        colA, colB = st.columns(2)
+        colA, colB, colC = st.columns(3)
 
         peak_I, cost = sol.fitness.values
 
         colA.metric("Peak infected", f"{peak_I:,.0f}")
         colB.metric("Cost", f"{cost:,.2f}")
+        reduction = 1.0 - (peak_I / peak0)
+        colC.metric("Reduction vs baseline", f"{reduction*100:.1f}%")
 
 
         nodes, neighbors = build_adjacency(
