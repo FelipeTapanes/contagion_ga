@@ -16,5 +16,5 @@ venv/
 .env
 
 # experiments
-notebooks/testing.ipynb
+notebooks/
 
