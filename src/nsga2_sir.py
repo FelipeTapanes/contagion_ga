@@ -122,10 +122,12 @@ def run_nsga2(
     gamma=0.10,
     tau=0.10,
     T=120,
+
     # cost weights
     c_beta=1.0,
     c_gamma=1.0,
     c_tau=1.0,
+    
     # nsga2 settings
     pop_size=150,
     # - number of generations: you can adjust this based on how long you want the optimization to run 

@@ -4,6 +4,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
 import time
+from src.spea2_sir import run_spea2
 from src.sir_model import build_adjacency, init_sir, run_sir
 from src.nsga2_sir import decode, run_nsga2
 
@@ -46,11 +47,16 @@ with st.sidebar.form("params_form"):
 
 
     st.header("Model / GA parameters")
+    algorithm = st.radio(
+        "Optimisation algorithm",
+        ["NSGA-II", "SPEA2"],
+        index=0
+    )
     pop_size = st.slider("Population size", 20, 400, 120, step=10)
     ngen = st.slider("Generations", 5, 300, 80, step=5)
     seed = st.number_input("Random seed", value=42, step=1)
 
-    run_btn = st.form_submit_button("Run NSGA-II")
+    run_btn = st.form_submit_button("Run GA")
 
 
 
@@ -125,18 +131,34 @@ if run_btn:
             status_text.info(f"Generation {gen}/{ngen}")
         time.sleep(0.01)  # <-- tiny yield so UI actually refreshes
 
-    counties, pareto_front = run_nsga2(
-        T=days,
-        pop_size=pop_size,
-        ngen=ngen,
-        seed=int(seed),
-        beta=beta,
-        gamma=gamma,
-        tau=tau,
-        seed_county=str(seed_county),
-        seed_infected=int(seed_infected),
-        progress_callback=progress_callback
+    if algorithm == "NSGA-II":
+        counties, pareto_front = run_nsga2(
+            T=days,
+            pop_size=pop_size,
+            ngen=ngen,
+            seed=int(seed),
+            beta=beta,
+            gamma=gamma,
+            tau=tau,
+            seed_county=str(seed_county),
+            seed_infected=int(seed_infected),
+            progress_callback=progress_callback
     )
+        
+    else:
+        counties, pareto_front = run_spea2(
+            T=days,
+            pop_size=pop_size,
+            archive_size=max(10, pop_size // 2),
+            ngen=ngen,
+            seed=int(seed),
+            beta=beta,
+            gamma=gamma,
+            tau=tau,
+            seed_county=str(seed_county),
+            seed_infected=int(seed_infected),
+            progress_callback=progress_callback
+        )
 
     progress_bar.progress(1.0)
     status_text.empty()
