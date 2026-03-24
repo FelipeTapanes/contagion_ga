@@ -1,12 +1,3 @@
-'''
-Docstring for sir_model
-Implements a simple SIR model on a network of counties, 
-where the edges represent travel times between county towns. 
-The model includes local infections, imported infections from neighboring counties, and recoveries. 
-The parameters beta, gamma, and tau control the rates of these processes.
-
-'''
-
 import pandas as pd
 import numpy as np
 
@@ -175,9 +166,9 @@ def run_sir(S, I, R, N, neighbors, beta, gamma, tau, T=120, z_beta = None, z_gam
     total_I = []
 
     # set the effective parameters for the SIR model based on the intervention parameters.
-    beta_intervention  = beta  * (1 - z_beta)
-    gamma_intervention = gamma * (1 + z_gamma)
-    tau_intervention   = tau   * (1 - z_tau)
+    beta_intervention  = beta  * (1 + z_beta)
+    gamma_intervention = gamma * (1 - z_gamma)
+    tau_intervention   = tau   * (1 + z_tau)
 
     # Run the SIR model for T time steps and record the total number of infected individuals at each step
     for _ in range(T):

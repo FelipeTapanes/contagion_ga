@@ -1,7 +1,7 @@
 import random
 import numpy as np
 from deap import base, creator, tools, algorithms
-from .sir_model import build_adjacency, init_sir, run_sir
+from .sir_model_market import build_adjacency, init_sir, run_sir
 
 
 # --------- HELPER FUNCTIONS ---------
@@ -75,9 +75,9 @@ def make_evaluator(nodes, neighbors, counties_csv_path,
             z_beta, z_gamma, z_tau
         )
 
-        peak_I = float(total_I.max())
+        spread = float(total_I.sum())
         cost = intervention_cost(z_beta, z_gamma, z_tau, c_beta, c_gamma, c_tau)
-        return (peak_I, cost)
+        return (spread, cost)
 
     return evaluate
 
@@ -172,10 +172,10 @@ def run_spea2(
     genome_len = 3 * n
 
     # DEAP class setup for SPEA2
-    if not hasattr(creator, "SirFitnessSPEA2"):
-        creator.create("SirFitnessSPEA2", base.Fitness, weights=(-1.0, -1.0))
-    if not hasattr(creator, "SirIndividualSPEA2"):
-        creator.create("SirIndividualSPEA2", list, fitness=creator.SirFitnessSPEA2)
+    if not hasattr(creator, "MarketFitnessSPEA2"):
+        creator.create("MarketFitnessSPEA2", base.Fitness, weights=(1.0, -1.0))
+    if not hasattr(creator, "MarketIndividualSPEA2"):
+        creator.create("MarketIndividualSPEA2", list, fitness=creator.MarketFitnessSPEA2)
 
     toolbox = base.Toolbox()
 
@@ -186,7 +186,7 @@ def run_spea2(
     toolbox.register(
         "individual",
         tools.initRepeat,
-        creator.SirIndividualSPEA2,
+        creator.MarketIndividualSPEA2,
         toolbox.attr_float,
         n=genome_len
     )

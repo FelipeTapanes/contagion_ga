@@ -1,7 +1,7 @@
 import random
 import numpy as np
 from deap import base, creator, tools, algorithms
-from .sir_model import build_adjacency, init_sir, run_sir
+from .sir_model_market import build_adjacency, init_sir, run_sir
 
 
 # --------- HELPER FUNCTIONS ---------
@@ -167,18 +167,18 @@ def run_nsga2(
     n = len(nodes)
     genome_len = 3 * n
 
-    # DEAP class setup for NSGA-II (2 objectives: minimize peak infections and minimize cost)  
-    if not hasattr(creator, "SirFitness"):
-        creator.create("SirFitness", base.Fitness, weights=(-1.0, -1.0))
-    if not hasattr(creator, "SirIndividual"):
-        creator.create("SirIndividual", list, fitness=creator.SirFitness)
+    # DEAP class setup for NSGA-II (2 objectives: maximize peak marketing and minimize cost)  
+    if not hasattr(creator, "MarketFitness"):
+        creator.create("MarketFitness", base.Fitness, weights=(1.0, -1.0))
+    if not hasattr(creator, "MarketIndividual"):
+        creator.create("MarketIndividual", list, fitness=creator.MarketFitness)
 
     toolbox = base.Toolbox()
 
     # Attribute generator: random float in [0, 1]
     toolbox.register("attr_float", random.uniform, 0.0, 0.8)
     # Structure initializers: define 'individual' to be a list of floats and 'population' to be a list of individuals
-    toolbox.register("individual", tools.initRepeat, creator.SirIndividual, toolbox.attr_float, n=genome_len)
+    toolbox.register("individual", tools.initRepeat, creator.MarketIndividual, toolbox.attr_float, n=genome_len)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
     # Fitness evaluator. make_evaluator is a closure that captures the model parameters 
