@@ -1,0 +1,6 @@
+# requirements-min.txt
+streamlit
+numpy
+pandas
+matplotlib
+deap
