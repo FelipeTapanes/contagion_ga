@@ -1,11 +1,21 @@
-# Network-Based Contagion Optimisation in Ireland
+# Ireland Contagion Optimiser
 
-This project models infectious disease spread across Irish counties using a networked SIR model and applies a genetic algorithm to optimise intervention strategies under budget constraints.
+A network-based contagion model using SIR dynamics and multi-objective optimisation (NSGA-II and SPEA2).
 
-## Structure
-- src/: core simulation and optimisation code
-- data/: input datasets
-- notebooks/: exploratory analysis
-- app/: Streamlit application
+## Requirements
 
-## How to run
+- Python 3.9–3.11
+- pip
+
+## Features
+
+- Disease spread modelling
+- Marketing diffusion modelling
+- Pareto front optimisation
+- Interactive Streamlit UI
+
+## How to Run
+
+```bash
+pip install -r requirements.txt
+streamlit run app.py
